@@ -7,17 +7,26 @@ to implement a service
 ## Service Architecture
 The archetype generates a base service structure based on an hexagonal architecture principles:
 
-![logical_view](/doc/images/logical_view.png)
+![conceptual_view](/doc/images/conceptual_view.png)
 
 So, there are three main parts:
 
-* Input API: this is the entry point from the outside. From this layer, business layer is called.
-* Business: this the main layer of the microservice and it's where the business logic must be implemented. This layer calls to the output API in
+* **Input API**: this is the entry point from the outside. From this layer, business layer is called.
+* **Business**: this the main layer of the microservice and it's where the business logic must be implemented. This layer calls to the output API in
 order to send events, save data into database or call to other services
-* Output API: this is where it's placed the implementation about how to call to a database engine, how to sent an event to the event bus or how to invoke an external
+* **Output API**: this is where it's placed the implementation about how to call to a database engine, how to sent an event to the event bus or how to invoke an external
 service.
 
+Every layer has a concrete responsability and it can be (and must be) tested independently. 
+
+Let's see how each layer is composed:
+
+![logical_view](/doc/images/logical_view.png)
+
+
+
 ## How to use
+
 TBC
 
 ### Local installation
