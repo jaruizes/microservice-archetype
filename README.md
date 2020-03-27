@@ -7,7 +7,7 @@ to implement a service
 ## Service Architecture
 The archetype generates a base service structure based on an hexagonal architecture principles:
 
-[logical_view](/doc/images/logical_view.png)
+![logical_view](/doc/images/logical_view.png)
 
 So, there are three main parts:
 
