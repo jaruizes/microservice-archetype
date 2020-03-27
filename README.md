@@ -40,21 +40,30 @@ Besides requirements, some principles have to be kept in mind:
 
 
 
-## Service Architecture
+## Designing the service
 
-In order to achieve the requirements exposed below, the archetype generates a base service structure based on an hexagonal architecture principles. 
+In order to achieve the requirements and principles outlined above I'm going to design a service architecture based on **hexagonal architecture** where business domain is totally isolated. 
 
-I'm going to explain the desing steps I follow until getting an implementation.
+The idea is to implement and test business logic in a isolated way and to interact with the outside world in two ways:
+
+- **Input API**: by defining APIs to offer business functionality to consumers (REST APIs or listening to some events)
+- **Output API**: by defining some points to reach the outside world (databases, event bus or calls to others services)
+
+The following picture shows these ideas:
+
+![hexagonal_view](/doc/images/conceptual_view_hexagonal.png)
+
+The next step is to translate this theorical approach based on an hexagonal architecture into a layered structure to meet the requirements and principles. To achieve this goal, I will start by establishing a conceptual view and layers, and then go step by step in more detail so that I can establish a physical structure at the end.
 
 
 
-### Conceptual view
+### Conceptual layers
 
-Let's start with the "conceptual view":
+Let's start with conceptual layers in order to understand how we can get a physical structure at the end. The following picture shows the conceptual layers:
 
-![conceptual_view](/doc/images/conceptual_view.png)
+![conceptual_view](/doc/images/conceptual_view_layers.png)
 
-So, there are **three main and independent parts**:
+So, there are **three main and independent parts or layers**:
 
 * **Input API**: this is the entry point from the outside and it could implement every kind of API: Rest, events, SOAP,...,etc. From this layer, business layer is called.
 * **Business**: this the main layer of the microservice and it's where the business logic must be implemented. This layer calls to the output API in
@@ -62,9 +71,11 @@ order to send events, save data into database or call to other services
 * **Output API**: this is where it's placed the implementation about how to call to a database engine, how to sent an event to the event bus or how to invoke an external
 service.
 
+
+
 #### Testing strategy
 
-When you are designing an software piece it's very important think how you are going to test that piece in order to guarantee a good quality. 
+When you are designing an software piece it's very important to think how you are going to test that piece. A good design allows an easy strategy testing.
 
 In this case, each layer has a specific responsibility and it should be independently tested, mocking the layer on which it depends. That means:
 
