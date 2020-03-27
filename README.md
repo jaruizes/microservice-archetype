@@ -7,6 +7,8 @@ to implement a service
 ## Service Architecture
 The archetype generates a base service structure based on an hexagonal architecture principles:
 
+### Conceptual view
+
 ![conceptual_view](/doc/images/conceptual_view.png)
 
 So, there are three main parts:
@@ -17,9 +19,21 @@ order to send events, save data into database or call to other services
 * **Output API**: this is where it's placed the implementation about how to call to a database engine, how to sent an event to the event bus or how to invoke an external
 service.
 
-Every layer has a concrete responsability and it can be (and must be) tested independently. 
+#### Testing strategy
+
+When you are designing an software piece it's very important think how you are going to test that piece in order to guarantee a good quality. 
+
+In this case, each layer has a specific responsibility and it should be independently tested, mocking the layer on which it depends. That means:
+
+![unit_testing_strategy](/doc/images/unit_testing_strategy.png)
+
+
+
+### Logical view
 
 Let's see how each layer is composed:
+
+
 
 ![logical_view](/doc/images/logical_view.png)
 
