@@ -4,16 +4,59 @@
 This artifact is a Maven archetype to accelerate (micro) services implementation by providing a basic structure
 to implement a service
 
+The implementation of this archetype is based on a serie of requirements and principles. 
+
+
+
+## Requirements
+
+The main ***requirements*** for this kind of service are:
+
+- **REQ_001:** It must be accesible from outside by a REST API.
+- **REQ_002:** It must be able to listen to events triggered from other services published to a event bus.
+- **REQ_003:** It must manage its own data model and its own database engine depending on its needs.
+- **REQ_004:** It must be able to publish events to an event bus.
+- **REQ_005:** It must be able to invoke other services (REST, SOAP,...,etc)
+- **REQ_006:** It must be tested and deployed independently.
+- **REQ_007:** The operational configuration must be independent.
+
+
+
+## Principles
+
+Besides requirements, some principles have to be kept in mind:
+
+- **PRINC_001:** Business logic has to be isolated of others layers in order to be developed independently.
+- **PRINC_002:** Business logic musn't have dependencies with others layers in order to be developed independently.
+- **PRINC_003:** Business data model musn't be shared with any other service
+- **PRINC_004:** Business validations must be implemented independently API validations.
+- **PRINC_005:** Business errors must be translated to API errors or messages not just thrown to outside.
+- **PRINC_006:** Business logic will not listen to events directly from event bus. Some business logic is invoked in response to events.
+- **PRINC_007:** Persistence logic has to be developed independently in order to be adapted to any database engine and data model
+- **PRINC_008:** Persistence data model must be independent of business data model in order to evolve separately and hides persistence details to business like database engine or model
+- **PRINC_009:** Persistence data model must be the most suitable to each service (SQL, normalized, de-normalized, NoSQL)
+- **PRINC_010:** Business hasn't to know how to invoke an external service so that implementation has to be separated from business logic and it should be able to evolve independently.
+- **PRINC_011:** Business just wants to publish an event not how to the event must be published to a concrete event bus. That logic has to be implemented separated from business logic and it should be able to evolve independently.
+
+
+
 ## Service Architecture
-The archetype generates a base service structure based on an hexagonal architecture principles:
+
+In order to achieve the requirements exposed below, the archetype generates a base service structure based on an hexagonal architecture principles. 
+
+I'm going to explain the desing steps I follow until getting an implementation.
+
+
 
 ### Conceptual view
 
+Let's start with the "conceptual view":
+
 ![conceptual_view](/doc/images/conceptual_view.png)
 
-So, there are three main parts:
+So, there are **three main and independent parts**:
 
-* **Input API**: this is the entry point from the outside. From this layer, business layer is called.
+* **Input API**: this is the entry point from the outside and it could implement every kind of API: Rest, events, SOAP,...,etc. From this layer, business layer is called.
 * **Business**: this the main layer of the microservice and it's where the business logic must be implemented. This layer calls to the output API in
 order to send events, save data into database or call to other services
 * **Output API**: this is where it's placed the implementation about how to call to a database engine, how to sent an event to the event bus or how to invoke an external
