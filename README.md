@@ -105,10 +105,11 @@ Business Layer sets how business logic will call to adapters by defining busines
 Summarizing,
 
 - the execution flow starts from Input API, goes through Business Layer and ends in Output API
+- Business Layer sets how Input API must call it and also the interface that Output API adapters must implement in order to be invoked from business logic
 
-- Business Layer sets how Input API must call it and the interface that Output API adapters must implement
+This allows that Business Layer "has no logical dependencies" with the rest of layers.
 
-  
+
 
 #### Testing strategy
 
