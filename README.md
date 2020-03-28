@@ -71,7 +71,7 @@ service.
 
 
 
-#### Execution Flow
+#### Execution Flow and dependencies between layers
 
 The following picture shows the service execution flow:
 
@@ -94,7 +94,13 @@ So, **the execution flow starts always in the API Layer**. This layer knows how 
 
 Business layer just wants to make a persistence action, calls to some service or publish some events but it doesn't know what database engine is going to be used and how information is stored there, how some service must be consumed or which is the Event Bus used and what it's necessary yo publish an event. **Details about how to access to outside world must be implemented in the Output API Layer.** 
 
-Following these rules we'll keep Business Layer "independent" and every layer could evolve independently, 
+Following these rules we'll keep Business Layer "independent" and every layer could evolve independently. The key is shown in the following picture:
+
+![layers_dependencies](/doc/images/layers_dependencies.png)
+
+Input API receives requests from customers (other services, UIs,...,etc) or listen to some events, process those requests and **invoke to Business Layer through Business API**. This means that Business Layer sets how Input API has to access to business logic.
+
+Business Layer sets how business logic will call to adapters by defining business ports. Output API must implements those definitions. **If Business Layer decides to change a business port, Output API must change its implementation, not the opposite.**
 
 
 
