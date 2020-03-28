@@ -102,7 +102,13 @@ Input API receives requests from customers (other services, UIs,...,etc) or list
 
 Business Layer sets how business logic will call to adapters by defining business ports. Output API must implements those definitions. **If Business Layer decides to change a business port, Output API must change its implementation, not the opposite.**
 
+Summarizing,
 
+- the execution flow starts from Input API, goes through Business Layer and ends in Output API
+
+- Business Layer sets how Input API must call it and the interface that Output API adapters must implement
+
+  
 
 #### Testing strategy
 
