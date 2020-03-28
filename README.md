@@ -113,19 +113,23 @@ This allows that Business Layer "has no logical dependencies" with the rest of l
 
 #### Testing strategy
 
-When you are designing an software piece it's very important to think how you are going to test that piece. A good design allows an easy strategy testing.
+When you are designing an software piece it's very important to think how you are going to test that piece. A good design allows good testing.
 
-In this case, each layer has a specific responsibility and it should be independently tested, mocking the layer on which it depends. That means:
+As we saw in the previous sections, each layer has a specific responsibility and it should be independently tested, mocking the layer on which it depends. That means:
 
 ![unit_testing_strategy](/doc/images/unit_testing_strategy.png)
+
+With this "unit testing" we'll check if each layer does what it should do but we also has to check if all of them together do what the service should do. So, we will also have to implement a "end-to-end" tests to check service use cases:
+
+![e2e-service-tests](/doc/images/e2e-service-tests.png)
 
 
 
 ### Logical view
 
-Let's see how each layer is composed:
+We've already design a conceptual view in order to have a high level point of view of the service and its conceptual components, checking if we're covering requirements and principles. 
 
-
+Now, we have to go deeper and decomponse each layer in logical components. Let's see how each layer is composed:
 
 ![logical_view](/doc/images/logical_view.png)
 
