@@ -27,16 +27,15 @@ The main ***requirements*** for this kind of service are:
 Besides requirements, some principles have to be kept in mind:
 
 - **PRINC_001:** Business logic has to be isolated of others layers in order to be developed independently.
-- **PRINC_002:** Business logic musn't have dependencies with others layers in order to be developed independently.
-- **PRINC_003:** Business data model musn't be shared with any other service
-- **PRINC_004:** Business validations must be implemented independently API validations.
-- **PRINC_005:** Business errors must be translated to API errors or messages not just thrown to outside.
-- **PRINC_006:** Business logic will not listen to events directly from event bus. Some business logic is invoked in response to events.
-- **PRINC_007:** Persistence logic has to be developed independently in order to be adapted to any database engine and data model
-- **PRINC_008:** Persistence data model must be independent of business data model in order to evolve separately and hides persistence details to business like database engine or model
-- **PRINC_009:** Persistence data model must be the most suitable to each service (SQL, normalized, de-normalized, NoSQL)
-- **PRINC_010:** Business hasn't to know how to invoke an external service so that implementation has to be separated from business logic and it should be able to evolve independently.
-- **PRINC_011:** Business just wants to publish an event not how to the event must be published to a concrete event bus. That logic has to be implemented separated from business logic and it should be able to evolve independently.
+- **PRINC_002:** Business data model musn't be shared with any other service
+- **PRINC_003:** Business validations must be implemented independently API validations.
+- **PRINC_004:** Business errors must be translated to API errors or messages not just thrown to outside.
+- **PRINC_005:** Business logic will not listen to events directly from event bus. Some business logic is invoked in response to events.
+- **PRINC_006:** Persistence logic has to be developed independently in order to be adapted to any database engine and data model
+- **PRINC_007:** Persistence data model must be independent of business data model in order to evolve separately and hides persistence details to business like database engine or model
+- **PRINC_008:** Persistence data model must be the most suitable to each service (SQL, normalized, de-normalized, NoSQL)
+- **PRINC_009:** Business hasn't to know how to invoke an external service so that implementation has to be separated from business logic and it should be able to evolve independently.
+- **PRINC_010:** Business just wants to publish an event not how to the event must be published to a concrete event bus. That logic has to be implemented separated from business logic and it should be able to evolve independently.
 
 
 
@@ -66,10 +65,36 @@ Let's start with conceptual layers in order to understand how we can get a physi
 So, there are **three main and independent parts or layers**:
 
 * **Input API**: this is the entry point from the outside and it could implement every kind of API: Rest, events, SOAP,...,etc. From this layer, business layer is called.
-* **Business**: this the main layer of the microservice and it's where the business logic must be implemented. This layer calls to the output API in
-order to send events, save data into database or call to other services
+* **Business**: this the main layer of the microservice and it's where the business logic must be implemented. This layer calls to the output API in order to send events, save data into database or call to other services
 * **Output API**: this is where it's placed the implementation about how to call to a database engine, how to sent an event to the event bus or how to invoke an external
 service.
+
+
+
+#### Execution Flow
+
+The following picture shows the service execution flow:
+
+![execution_flow](/doc/images/execution_flow.png)
+
+According to the image, the service can be invoked by two different ways:
+
+- Calling to its REST API
+- Publishing an event to Event Bus
+
+So, **the execution flow starts always in the API Layer**. This layer knows how to implement a Rest API or how an event must be consumed from the Event Bus used.Then, API layer calls to Business Layer in order to execute the requested operation. Sometimes API layer will wait for a response (Rest API) and sometimes not (events). 
+
+**Business layer doesn't know the execution has been started (Rest API or events) and it doesn't care**. It just performs the logic associated to the operation requested and depending on that logic could happen different scenarios:
+
+- Performing a database operation like insert, update, delete or query data.
+- Calling to other services
+- Publish an event to Event Bus
+
+**These actions are performed in the Output API layer that knows how to perform them.** **Business layer doesn't really know those details and it doesn't care.** 
+
+Business layer just wants to make a persistence action, calls to some service or publish some events but it doesn't know what database engine is going to be used and how information is stored there, how some service must be consumed or which is the Event Bus used and what it's necessary yo publish an event. **Details about how to access to outside world must be implemented in the Output API Layer.** 
+
+Following these rules we'll keep Business Layer "independent" and every layer could evolve independently, 
 
 
 
