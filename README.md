@@ -129,15 +129,95 @@ With this "unit testing" we'll check if each layer does what it should do but we
 
 We've already design a conceptual view in order to have a high level point of view of the service and its conceptual components, checking if we're covering requirements and principles. 
 
-Now, we have to go deeper and decomponse each layer in logical components. Let's see how each layer is composed:
+Now, we have to go deeper and decomponse each layer and main componentes in logical pieces. Let's see how each layer is composed:
 
 ![logical_view](/doc/images/logical_view.png)
 
+#### Input API
 
+This layer contains two main components:
+
+- **Rest API Handler**: its responsibility is to expose Rest endpoints to customers in order to execute business operations. It's composed by:
+  - **Definition**: this is the Rest definition exposed to outside. It defines: endpoints and paths, resources, verbs, input objects and output objects.
+  - **DTO**: defines the structure of input and output objects (resources) used by the endpoints. Error objects are included here.
+  - **Implementation**: this is the implementation of the Rest API definition. In this piece:
+    1. Requests are managed and validated, 
+    2. DTOs are translated to Business API input objects,
+    3. Operations exposed in the Business API are invoked
+    4. Responses from Business API are managed and translated to response DTOs and business exceptions also are catched and translated to Rest API errors messages and HTTP status codes.
+- **Events Handler**: its responsibility is to listen to events and calls to business API to execute business operations associated to those events. This piece knows all the details about how to listen to events to the specific event bus used.  It's composed by:
+  - **Definition**: this is the definition of how the events are listened to
+  - **DTO**: defines the structure of each event
+  - **Implementation**: this is the specific implementation about how to connect and listen to events from the event bus installed. In this piece:
+    1. Events are listened to and validated, 
+    2. DTOs are translated to Business API input objects,
+    3. Operations exposed in the Business API are invoked.
+
+In this layer, API validations will be made. This validations could be input format and structure, mandatory fields,...,etc. 
+
+
+
+#### Business
+
+This is the **core layer** because inside it it's implemented the business logic. This layer consists on these components:
+
+- **Business API:** this is the definition of the business operations and it's formed by the definition of the operations, the data managed by the operations and the exceptions associated to those operations:
+
+  - **Business API Definition:** defines the different business operations that the service is going to perform.
+
+  - **Business API Data Model:** this is the data managed by business operations, input and output. It's important not to share this data with consumers because in that case you'll be coupling your service and your business logic totally with the outside world. 
+
+    In order to avoid that kind of coupling, Input API is implemented. By this way, it's possible to evolve business logic without changing the way the service is consumed by consumers. Obviously, sometimes business changes triggering API changes and versioning our service but sometimes, business changes could be managed used Input API Layer. 
+
+  - **Business Exceptions:** contains the different exceptions associated to business operations
+
+  - **Business API Implementation:** this is the implementation of the API Definition. This component doesn't implement business logic. It's simply the access point to business model and calls to objects in Business Model. 
+
+- **Business Model:** this piece contains the implementation of the different business operations. In this piece we'll find aggregates, entities and value objects and it will use business port when it's required. The idea is to avoid an anemic model and using the Business API to expose business operations via business service(s) but really performing those opperations in the Business Model.
+
+  
+
+- **Business Ports:** this sublayer contains the ports definitions in order to be used by Business Model. Adapters must implement these definitions.
+
+
+
+#### Output API
+
+This is the layer where the service send data outside by events, calls to other services or calls to database. There are three adapters in this archetype (persistence, services and events) but depending on the business needs could be necessary to add more adapter types.
+
+Every adapter follows the same pattern:
+
+- **Port implementation:** implements the port definition set by Business Layer. In this implementation, details about how to connect and manage actions against database, other services or event bus are here. By this way, Business Layer is protected for infrastructure changes.
+
+- **Model:** this represents the model in which data is managed internally by the adapter and the final system (database, service or event bus). That means that database model is independent of Business Layer or events structure, for instance. 
+
+  Business doesn't know (and it doesn't care) if the database engine is SQL or NoSQL, if the tables are normalized or not. These details are only known by the adapter. The same with the event bus or external services. Details about how to consume some service are only known by the adapter, not by the Business Layer.
+
+
+
+#### Design concerns
+
+You may are wondering the reason that Input API definition, DTOS or input/output events definitions are not in Business Layer. In my opinion, Rest is just a channel in which business features are exposed to customers but it's just that, a channel. So, details about channels should be controlled outside Business Layer. The same with input events. Business layer doesn't have to know how events are listened.
+
+Ok, Input API is business, it's true. But the whole service is business because if there isn't a business reason to build the service, the service has no sense. 
+
+When we though about publishing an event we're thinking about business and business layer calls to a specific port in order to do that and it'll pass an object containing all the business data that should be published. Then, the adapter will translate that business information to a format in which it's possible to publish in the event bus that it's being used in that moment in the company. Many times adding some extra information to the business raw event is necessary. 
+
+Before building a service is very important to define its target and how it's going to be used. For instance:
+
+- Why is it necessary the service? Which business need is it going to solve?
+
+- How is the service going to be consumed? Rest? Events? Which events is it going to listened to?
+
+- Which events is it going to publish?
+
+- Which services does it need to call? How do they need to be consumed?
+
+- Which is the best engine and model to persist the service information?
+
+  
 
 ## How to use
-
-TBC
 
 ### Local installation
 The first step is to install the archetype in your local maven repository. To do this, execute:
